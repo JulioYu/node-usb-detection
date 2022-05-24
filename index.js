@@ -10,7 +10,17 @@ function isFunction(functionToCheck) {
 if(global[index.name] && global[index.name].version === index.version) {
 	module.exports = global[index.name];
 } else {
-	var detection = require('bindings')('detection.node');
+    const path = require('path');
+    const isDevMode = process.env.NODE_ENV === 'development';
+    const exeFolderPath = path.resolve(process.execPath, '..');
+    let detection = null;
+
+    if (isDevMode) {
+        detection = require('bindings')('detection.node');
+    } else {
+        detection = require('node-gyp-build')(path.join(exeFolderPath, 'node_modules', 'usb-detection'));
+    }
+
 	var EventEmitter2 = require('eventemitter2').EventEmitter2;
 
 	var detector = new EventEmitter2({
